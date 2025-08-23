@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import "./tableForm.css";
 
 interface Props {
@@ -12,6 +12,12 @@ export const Table = (props: Props) => {
     setTableData(data);
   }, [data]);
 
+  const studentScholarship = useMemo(() => {
+    return tableData.map((s) => {
+      return { ...s, eligible: s.age >= 20 };
+    });
+  }, [tableData]);
+
   return (
     <>
       <table>
@@ -20,6 +26,7 @@ export const Table = (props: Props) => {
             <th>Name</th>
             <th>Age</th>
             <th>Grade</th>
+            <th>Eligible for Scholarship</th>
           </tr>
         </thead>
         <tbody>
@@ -28,6 +35,7 @@ export const Table = (props: Props) => {
               <td>{item.name}</td>
               <td>{item.age}</td>
               <td>{item.grade}</td>
+              <td>{studentScholarship.find(s => s.id === item.id)?.eligible ? "Yes" : "No"}</td>
             </tr>
           ))}
         </tbody>
@@ -36,3 +44,5 @@ export const Table = (props: Props) => {
     </>
   );
 };
+
+

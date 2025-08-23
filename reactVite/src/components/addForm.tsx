@@ -33,6 +33,8 @@ export const AddForm = () => {
 
   const handleClear = () => setStudents([]);
 
+
+
   return (
     <>
       {/* Table will always render the latest students */}
