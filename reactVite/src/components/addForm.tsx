@@ -1,31 +1,47 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Table } from "./table";
-import { v4 as uuidv4 } from "uuid";
+import { addStudent, fetchStudents } from "../api/students";
 import "./tableForm.css";
+
+interface Student {
+  _id: string; // MongoDB uses _id
+  name: string;
+  age: number;
+  grade: string;
+}
 
 export const AddForm = () => {
   const nameref = useRef<HTMLInputElement>(null);
   const ageref = useRef<HTMLInputElement>(null);
   const graderef = useRef<HTMLInputElement>(null);
 
-  const [students, setStudents] = useState<
-    { id: string; name: string; age: number; grade: string }[]
-  >([]);
+  const [students, setStudents] = useState<Student[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // stop page reload
+  
+  useEffect(() => {
+    const loadStudents = async () => {
+      const data = await fetchStudents();
+      setStudents(data);
+    };
+    loadStudents();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     const newStudent = {
-      id: uuidv4(),
       name: nameref.current?.value || "",
       age: Number(ageref.current?.value) || 0,
       grade: graderef.current?.value || "",
     };
 
-    // add new student to the list
-    setStudents((prev) => [...prev, newStudent]);
+    // 1. save to DB
+    const saved = await addStudent(newStudent);
 
-    // optional: clear inputs
+    // 2. update state
+    setStudents((prev) => [...prev, saved]);
+
+    // clear inputs
     if (nameref.current) nameref.current.value = "";
     if (ageref.current) ageref.current.value = "";
     if (graderef.current) graderef.current.value = "";
@@ -33,11 +49,8 @@ export const AddForm = () => {
 
   const handleClear = () => setStudents([]);
 
-
-
   return (
     <>
-      {/* Table will always render the latest students */}
       <Table data={students} />
 
       <form onSubmit={handleSubmit}>

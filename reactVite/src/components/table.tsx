@@ -1,48 +1,41 @@
-import React, { useMemo } from "react";
-import "./tableForm.css";
+import { deleteStudent } from "../api/students";
 
-interface Props {
-  data: { id: string; name: string; age: number; grade: string }[];
+
+
+interface Student {
+  _id: string;
+  name: string;
+  age: number;
+  grade: string;
 }
 
-export const Table = (props: Props) => {
-  const { data } = props;
-  const [tableData, setTableData] = React.useState(data);
-  React.useEffect(() => {
-    setTableData(data);
-  }, [data]);
+interface Props {
+  data: Student[];
+}
 
-  const studentScholarship = useMemo(() => {
-    return tableData.map((s) => {
-      return { ...s, eligible: s.age >= 20 };
-    });
-  }, [tableData]);
-
+export const Table = ({ data }: Props) => {
   return (
-    <>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Grade</th>
-            <th>Eligible for Scholarship</th>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Grade</th>
+          <th>Eligible for Scholarship</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((item) => (
+          <tr key={item._id}>
+            <td>{item.name}</td>
+            <td>{item.age}</td>
+            <td>{item.grade}</td>
+            <td>{item.age >= 20 ? "Yes" : "No"}</td>
+            <td><button className="clear-btn" onClick={() => deleteStudent(item._id)}>Delete</button></td>
           </tr>
-        </thead>
-        <tbody>
-          {tableData.map((item) => (
-            <tr key={item.id}>
-              <td>{item.name}</td>
-              <td>{item.age}</td>
-              <td>{item.grade}</td>
-              <td>{studentScholarship.find(s => s.id === item.id)?.eligible ? "Yes" : "No"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <br />
-    </>
+        ))}
+      </tbody>
+    </table>
   );
 };
-
-
